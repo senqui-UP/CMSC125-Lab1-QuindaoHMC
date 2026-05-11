@@ -79,9 +79,8 @@ int execute_command(const Command *cmd)
 
         // replace child image with the requested program
         execvp(cmd->command, cmd->args);
-
         // execvp only returns on failure
-        fprintf(stderr, "mysh: command not found: %s\n", cmd->command);
+        perror("mysh: execvp");
         exit(127);
     }
 
