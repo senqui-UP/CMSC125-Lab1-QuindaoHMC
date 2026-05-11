@@ -17,6 +17,20 @@ void init_command(Command *cmd)
         cmd->args[i] = NULL;
 }
 
+// strip_backround ─────────────────────────────────────────────
+/*  cases for when tokens are command&, so that they can be read as the command
+ *  replaces trailing & with '\0', returns 1 to signal that the background flag should be set
+ *  exactly "&" tokens are left unchanged, returns 0 — the main loop handles that case itself */
+static int strip_background(char *token)
+{
+    size_t len = strlen(token);
+    if (len > 1 && token[len - 1] == '&') {
+        token[len - 1] = '\0';   /* null-terminate before the '&' */
+        return 1;
+    }
+    return 0;
+}
+
 // parse_input ─────────────────────────────────────────────
 //  Tokenises `input` and fills *cmd struct
 int parse_input(char *input, Command *cmd)
@@ -32,6 +46,10 @@ int parse_input(char *input, Command *cmd)
 
     // checks if token is a recognized operator
     while (token != NULL) {
+
+        // strip trailing
+        if (strip_background(token))
+            cmd->background = true;
 
         // >> Output redirect (Append)
         if (strcmp(token, ">>") == 0) {
